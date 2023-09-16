@@ -114,7 +114,7 @@ function App() {
           <p className='frndname'>{singleperson.frndname}</p>
           <p>
             {singleperson.gavemony == "friend" ? (
-              <span style={{ color: "red" }}> you owe {singleperson.frndname} {singleperson.mymoney} </span>
+              <span style={{ color: "red" }}> you owes {singleperson.frndname} {singleperson.mymoney} </span>
             ) : singleperson.gavemony == "me" ? (
               <span style={{ color: "green" }}> {singleperson.frndname} owes you {singleperson.frndmoney}  </span>
             ) : (
