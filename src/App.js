@@ -2,7 +2,8 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const friendsdata = [
+
+  let [friendliststate, setfriendliststate] = useState([
     {
       frndname: "Zain",
       imgurl: "https://avatars.githubusercontent.com/u/121414309?v=4",
@@ -24,9 +25,8 @@ function App() {
       mymoney: 300,
       gavemony: ''
     }
-  ];
+  ]);
 
-  let [friendliststate, setfriendliststate] = useState(friendsdata);
   let [ismodaltrue, setismodaltrue] = useState(false);
   let [selectperson, setselectperson] = useState({ person: null, index: null });
   let [isaddfriendmodal, setisaddfriendmodal] = useState(false);
@@ -38,7 +38,6 @@ function App() {
     gavemony: ''
   });
 
-  let [billValue, setBillValue] = useState('');
   let [yourExpense, setYourExpense] = useState('');
   let [friendExpense, setFriendExpense] = useState('');
   let [gaveMony, setgaveMoney] = useState('');
@@ -94,7 +93,7 @@ function App() {
     };
 
     setfriendliststate([...friendliststate, newFriend]);
-    setselectperson({ person: newFriend, index: friendliststate.length }); // Set the index as the length of the array
+    setselectperson({ person: newFriend, index: friendliststate.length });
     setNewFriendData({
       frndname: '',
       imgurl: '',
@@ -106,6 +105,7 @@ function App() {
   }
 
   function singlepersonfoo(singleperson, i) {
+
     return (
       <div className='singleelement' key={singleperson.frndname}>
         <img src={singleperson.imgurl} alt="" />
@@ -124,7 +124,7 @@ function App() {
         </div>
         <button
           onClick={() => {
-            setselectperson({ person: singleperson, index: i }); // Pass both the person and the index
+            setselectperson({ person: singleperson, index: i });
             setismodaltrue(true);
           }}
           className='frndlistbtn'
@@ -136,9 +136,8 @@ function App() {
   }
 
   function splitbillfoo(person, index) {
-    console.log(billValue, yourExpense, friendExpense, gaveMony);
     const { frndname: friendname, imgurl: imageurl } = person;
-    const cloneoffrienddata = [...friendliststate]; // Changed 'friendsdata' to 'friendliststate'
+    const cloneoffrienddata = [...friendliststate];
     const currentobject = {
       frndname: friendname,
       imgurl: imageurl,
@@ -148,9 +147,9 @@ function App() {
     };
   
     cloneoffrienddata.splice(index, 1, currentobject);
-    console.log(cloneoffrienddata);
     setfriendliststate(cloneoffrienddata);
-    setismodaltrue(false)
+
+
   }
 
   return (
@@ -167,14 +166,6 @@ function App() {
             <div className='headingofselectform'>Split a bill with {selectperson.person.frndname}</div>
             <div className='inputofselestform'>
               <div>
-                <p>Bill value</p> <input
-                  placeholder={selectperson.person.frndmoney === 0 && selectperson.person.mymoney === 0 ? '1000' : selectperson.person.frndmoney + selectperson.person.mymoney}
-                  type="number"
-                  value={billValue}
-                  onChange={(e) => setBillValue(e.target.value)}
-                />
-              </div>
-              <div>
                 <p>Your expense</p> <input
                   placeholder={selectperson.person.mymoney == 0 ? "450" : selectperson.person.mymoney}
                   type="number"
@@ -184,14 +175,16 @@ function App() {
               </div>
               <div>
                 <p>{selectperson.person.frndname} expense</p> <input
-                  placeholder={selectperson.person.frndmoney === 0 ? '550' : selectperson.person.frndmoney}
+                  placeholder={selectperson.person.frndmoney == 0 ? '550' : selectperson.person.frndmoney}
                   type="number"
                   value={friendExpense}
                   onChange={(e) => setFriendExpense(e.target.value)}
                 />
               </div>
               <div>
-                <p>Who is paying the bill</p> <select onChange={(e) => setgaveMoney(e.target.value)}>
+                <p>Who is paying the bill</p> <select onClick={(e) => {
+                  console.log(e.target.value)
+                  setgaveMoney(e.target.value)}}>
                   <option value="me">You</option>
                   <option value="friend">{selectperson.person.frndname}</option>
                 </select>
