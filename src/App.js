@@ -26,20 +26,22 @@ function App() {
     }
   ];
 
-  const [friendliststate, setfriendliststate] = useState(friendsdata);
-  const [ismodaltrue, setismodaltrue] = useState(false);
-  const [selectperson, setselectperson] = useState({});
-  const [isaddfriendmodal, setisaddfriendmodal] = useState(false);
-  const [newFriendData, setNewFriendData] = useState({
+  let [friendliststate, setfriendliststate] = useState(friendsdata);
+  let [ismodaltrue, setismodaltrue] = useState(false);
+  let [selectperson, setselectperson] = useState({ person: null, index: null });
+  let [isaddfriendmodal, setisaddfriendmodal] = useState(false);
+  let [newFriendData, setNewFriendData] = useState({
     frndname: '',
     imgurl: '',
     frndmoney: '',
     mymoney: '',
     gavemony: ''
   });
-  const [billValue, setBillValue] = useState('');
-  const [yourExpense, setYourExpense] = useState('');
-  const [friendExpense, setFriendExpense] = useState('');
+
+  let [billValue, setBillValue] = useState('');
+  let [yourExpense, setYourExpense] = useState('');
+  let [friendExpense, setFriendExpense] = useState('');
+  let [gaveMony, setgaveMoney] = useState('');
 
   function addFriend() {
     if (!isaddfriendmodal) {
@@ -92,7 +94,7 @@ function App() {
     };
 
     setfriendliststate([...friendliststate, newFriend]);
-    setselectperson(newFriend);
+    setselectperson({ person: newFriend, index: friendliststate.length }); // Set the index as the length of the array
     setNewFriendData({
       frndname: '',
       imgurl: '',
@@ -103,37 +105,7 @@ function App() {
     setisaddfriendmodal(false);
   }
 
-  function handleSplitBill() {
-    // Ensure the input fields are not empty and convert values to numbers
-    if (billValue === '' || yourExpense === '' || friendExpense === '') {
-      alert('Please fill in all fields.');
-      return;
-    }
-
-    // Calculate the new values for the selected person
-    const updatedFriendlist = friendliststate.map((friend) => {
-      if (friend === selectperson) {
-        const newFriend = { ...friend };
-        newFriend.frndmoney = parseFloat(billValue) - parseFloat(yourExpense);
-        newFriend.mymoney = parseFloat(yourExpense) - parseFloat(friendExpense);
-        return newFriend;
-      }
-      return friend;
-    });
-
-    // Update the friendliststate with the modified data
-    setfriendliststate(updatedFriendlist);
-
-    // Close the split bill form
-    setismodaltrue(false);
-
-    // Clear input fields
-    setBillValue('');
-    setYourExpense('');
-    setFriendExpense('');
-  }
-
-  function singlepersonfoo(singleperson) {
+  function singlepersonfoo(singleperson, i) {
     return (
       <div className='singleelement' key={singleperson.frndname}>
         <img src={singleperson.imgurl} alt="" />
@@ -141,9 +113,9 @@ function App() {
         <div className='txtareaoflist'>
           <p className='frndname'>{singleperson.frndname}</p>
           <p>
-            {singleperson.gavemony === "friend" ? (
+            {singleperson.gavemony == "friend" ? (
               <span style={{ color: "red" }}> you owe {singleperson.frndname} {singleperson.mymoney} </span>
-            ) : singleperson.gavemony === "me" ? (
+            ) : singleperson.gavemony == "me" ? (
               <span style={{ color: "green" }}> {singleperson.frndname} owes you {singleperson.frndmoney}  </span>
             ) : (
               <span> You and {singleperson.frndname} are even </span>
@@ -152,7 +124,7 @@ function App() {
         </div>
         <button
           onClick={() => {
-            setselectperson(singleperson);
+            setselectperson({ person: singleperson, index: i }); // Pass both the person and the index
             setismodaltrue(true);
           }}
           className='frndlistbtn'
@@ -163,22 +135,40 @@ function App() {
     );
   }
 
+  function splitbillfoo(person, index) {
+    console.log(billValue, yourExpense, friendExpense, gaveMony);
+    const { frndname: friendname, imgurl: imageurl } = person;
+    const cloneoffrienddata = [...friendliststate]; // Changed 'friendsdata' to 'friendliststate'
+    const currentobject = {
+      frndname: friendname,
+      imgurl: imageurl,
+      frndmoney: friendExpense,
+      mymoney: yourExpense,
+      gavemony: gaveMony,
+    };
+  
+    cloneoffrienddata.splice(index, 1, currentobject);
+    console.log(cloneoffrienddata);
+    setfriendliststate(cloneoffrienddata);
+    setismodaltrue(false)
+  }
+
   return (
     <div className="body">
       <div className='firstline'>
         <div className='friendlist'>
-          {friendliststate.map((singleperson) => singlepersonfoo(singleperson))}
+          {friendliststate.map((singleperson, i) => singlepersonfoo(singleperson, i))}
         </div>
         <div className='addfriendform'>{addFriend()}</div>
       </div>
       <div className='secondline'>
         {ismodaltrue === true ? (
           <div className='formofselect'>
-            <div className='headingofselectform'>Split a bill with {selectperson.frndname}</div>
+            <div className='headingofselectform'>Split a bill with {selectperson.person.frndname}</div>
             <div className='inputofselestform'>
               <div>
                 <p>Bill value</p> <input
-                  placeholder={selectperson.frndmoney === 0 && selectperson.mymoney === 0 ? '1000' : selectperson.frndmoney + selectperson.mymoney}
+                  placeholder={selectperson.person.frndmoney === 0 && selectperson.person.mymoney === 0 ? '1000' : selectperson.person.frndmoney + selectperson.person.mymoney}
                   type="number"
                   value={billValue}
                   onChange={(e) => setBillValue(e.target.value)}
@@ -186,28 +176,28 @@ function App() {
               </div>
               <div>
                 <p>Your expense</p> <input
-                  placeholder={selectperson.mymoney === 0 ? "450" : selectperson.mymoney}
+                  placeholder={selectperson.person.mymoney == 0 ? "450" : selectperson.person.mymoney}
                   type="number"
                   value={yourExpense}
                   onChange={(e) => setYourExpense(e.target.value)}
                 />
               </div>
               <div>
-                <p>{selectperson.frndname} expense</p> <input
-                  placeholder={selectperson.frndmoney === 0 ? '550' : selectperson.frndmoney}
+                <p>{selectperson.person.frndname} expense</p> <input
+                  placeholder={selectperson.person.frndmoney === 0 ? '550' : selectperson.person.frndmoney}
                   type="number"
                   value={friendExpense}
                   onChange={(e) => setFriendExpense(e.target.value)}
                 />
               </div>
               <div>
-                <p>Who is paying the bill</p> <select>
-                  <option>You</option>
-                  <option>{selectperson.frndname}</option>
+                <p>Who is paying the bill</p> <select onChange={(e) => setgaveMoney(e.target.value)}>
+                  <option value="me">You</option>
+                  <option value="friend">{selectperson.person.frndname}</option>
                 </select>
               </div>
             </div>
-            <div onClick={handleSplitBill} className='splitbill'>
+            <div onClick={() => splitbillfoo(selectperson.person, selectperson.index)} className='splitbill'>
               Split bill
             </div>
           </div>
