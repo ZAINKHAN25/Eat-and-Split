@@ -149,7 +149,7 @@ function App() {
     cloneoffrienddata.splice(index, 1, currentobject);
     setfriendliststate(cloneoffrienddata);
 
-
+    setismodaltrue(false)
   }
 
   return (
