@@ -143,7 +143,7 @@ function App() {
       imgurl: imageurl,
       frndmoney: friendExpense,
       mymoney: yourExpense,
-      gavemony: gaveMony,
+      gavemony: gaveMony == "" ? "me" :  gaveMony,
     };
   
     cloneoffrienddata.splice(index, 1, currentobject);
